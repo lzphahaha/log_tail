@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>log tail</title>
+    <style>
+    </style>
+    <script type="text/javascript">
+      var messageBox;
+      var messageLog;
+      var socket;
+
+      window.onload = function() {
+        messageBox = document.getElementById('messageBox');
+        messageLog = document.getElementById('messageLog');
+        connect();
+      }
+
+      function connect() {
+
+        //remember replace the ip address
+        socket = new WebSocket("ws://127.0.0.1:30066/log_tail");
+
+        socket.onopen = connectionOpen;
+        socket.onmessage = messageReceived;
+        socket.onerror = errorOccurred;
+        socket.onclose = connectionClosed;
+      }
+
+      function disconnect(){
+        socket.close();
+      }
+
+      function sendMessage(){
+        var message = messageBox.value;
+ 
+
+        socket.send(message);
+
+        messageLog.innerHTML += "<br>set file path：" + message;
+      }
+
+      function connectionOpen(e) {
+        messageLog.innerHTML += "<br>--- Socket starts ---";
+      }
+
+      function messageReceived(e){
+        messageLog.innerHTML += "<br>receive：" + e.data;
+      }
+
+      function errorOccurred(e){
+        messageLog.innerHTML += "<br>error：" + e.data;
+      }
+
+      function connectionClosed(e) {
+        messageLog.innerHTML += "<br>--- Socket closes ---";
+      }
+    </script>
+  </head>
+  <body>
+    <br>
+    <hr>
+    <br>
+    <input id="messageBox" type="text" style="width:600px" />
+    <button onclick="sendMessage()" style="width:150px;background-color:#7ED321">set file path</button>
+    <button onclick="disconnect()" style="background-color:#7ED321">close</button>
+    <div id="messageLog"></div>
+  </body>
+</html>
